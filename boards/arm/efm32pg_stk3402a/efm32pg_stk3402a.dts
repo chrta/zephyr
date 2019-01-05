@@ -72,3 +72,8 @@
 	location = <15>;
 	status = "ok";
 };
+
+&gpio {
+	location-swo = <0>;
+	status = "ok";
+};
