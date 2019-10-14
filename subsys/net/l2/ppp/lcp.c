@@ -76,6 +76,8 @@ static int lcp_config_info_req(struct ppp_fsm *fsm,
 			       u16_t length,
 			       struct net_buf **buf)
 {
+	struct ppp_context *ctx = CONTAINER_OF(fsm, struct ppp_context,
+					       lcp.fsm);
 	struct ppp_option_pkt options[MAX_LCP_OPTIONS];
 	struct ppp_option_pkt nack_options[MAX_LCP_OPTIONS];
 	struct net_buf *nack = NULL;
@@ -127,8 +129,12 @@ static int lcp_config_info_req(struct ppp_fsm *fsm,
 			goto ignore_option;
 
 		case LCP_OPTION_PROTO_COMPRESS:
-			count_rej++;
-			goto ignore_option;
+			if (!ctx->lcp.my_options.negotiate_proto_compression) {
+				count_rej++;
+				goto ignore_option;
+			}
+			ctx->lcp.my_accepted.negotiate_proto_compression = 1;
+			break;
 
 		case LCP_OPTION_ADDR_CTRL_COMPRESS:
 			count_rej++;

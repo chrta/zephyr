@@ -342,6 +342,17 @@ void ppp_fsm_open(struct ppp_fsm *fsm)
 	}
 }
 
+static int ppp_write_protocol(struct net_pkt *pkt, u16_t protocol,
+			      bool proto_compression)
+{
+    if (proto_compression && (protocol & 1))
+    {
+	return net_pkt_write_u8(pkt, (u8_t) protocol);
+    }
+    
+    return net_pkt_write_be16(pkt, protocol);
+}
+
 int ppp_send_pkt(struct ppp_fsm *fsm, struct net_if *iface,
 		 enum ppp_packet_type type, u8_t id,
 		 void *data, u32_t data_len)
@@ -352,6 +363,7 @@ int ppp_send_pkt(struct ppp_fsm *fsm, struct net_if *iface,
 	struct net_pkt *req_pkt = data;
 	u16_t protocol = 0;
 	size_t len = 0;
+	bool proto_compression = false;
 	struct ppp_packet ppp;
 	struct net_pkt *pkt;
 	int ret;
@@ -377,6 +389,11 @@ int ppp_send_pkt(struct ppp_fsm *fsm, struct net_if *iface,
 		NET_ASSERT(ctx->iface);
 
 		iface = ctx->iface;
+
+		if (fsm->protocol != PPP_LCP) {
+			proto_compression =
+				ctx->lcp.my_accepted.negotiate_proto_compression;
+		}
 	}
 
 	if (fsm) {
@@ -441,7 +458,8 @@ int ppp_send_pkt(struct ppp_fsm *fsm, struct net_if *iface,
 		goto out_of_mem;
 	}
 
-	ret = net_pkt_write_be16(pkt, protocol);
+	ret = ppp_write_protocol(pkt, protocol, proto_compression);
+
 	if (ret < 0) {
 		goto out_of_mem;
 	}
