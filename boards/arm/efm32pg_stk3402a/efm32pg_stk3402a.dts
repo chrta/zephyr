@@ -87,6 +87,14 @@
 	status = "okay";
 };
 
+&wdog0 {
+	status = "okay";
+};
+
+&wdog1 {
+	status = "okay";
+};
+
 &flash0 {
 	/*
 	 * For more information, see:
