@@ -74,6 +74,8 @@ The efr32mg_sltb004a board configuration supports the following hardware feature
 +-----------+------------+-------------------------------------+
 | I2C       | on-chip    | i2c port-polling                    |
 +-----------+------------+-------------------------------------+
+| WATCHDOG  | on-chip    | watchdog                            |
++-----------+------------+-------------------------------------+
 
 The default configuration can be found in the defconfig file:
 ``boards/arm/efr32mg_sltb004a/efr32mg_sltb004a_defconfig``.
